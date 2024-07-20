@@ -1,25 +1,25 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext';
-import Header from './components/Header'
-import Footer from './components/Footer'
-import Home from './pages/Home'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Catalog from './pages/Catalog'
-import UserProfile from './pages/UserProfile'
-import OrderManagement from './pages/OrderManagement'
-import Reports from './pages/Reports'
-import InventoryReport from './components/reports/InventoryReport'
-import MovementsReport from './components/reports/MovementsReport'
-import TrendsReport from './components/reports/TrendsReport'
-import AlertsReport from './components/reports/AlertsReport'
-import FinancialReport from './components/reports/FinancialReport'
-import PatientReport from './components/reports/PatientReport'
-import MedicationPredictionPage from './pages/MedicationPredictionPage'
-import MedicationAnalysisPage from './pages/MedicationAnalysisPage'
-import AlertManagementPage from './pages/AlertManagementPage'
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import Footer from './components/Footer';
+import Header from './components/Header';
+import Login from './components/Login/Login';
+import Register from './components/Register/Register';
+import AlertsReport from './components/reports/AlertsReport';
+import FinancialReport from './components/reports/FinancialReport';
+import InventoryReport from './components/reports/InventoryReport';
+import MovementsReport from './components/reports/MovementsReport';
+import PatientReport from './components/reports/PatientReport';
+import TrendsReport from './components/reports/TrendsReport';
 import RoleManagement from './components/RoleManagement';
 import withRole from './components/withRole';
+import { AuthProvider } from './context/AuthContext';
+import AlertManagementPage from './pages/AlertManagementPage';
+import Catalog from './pages/Catalog';
+import Home from './pages/Home';
+import MedicationAnalysisPage from './pages/MedicationAnalysisPage';
+import MedicationPredictionPage from './pages/MedicationPredictionPage';
+import OrderManagement from './pages/OrderManagement';
+import Reports from './pages/Reports';
+import UserProfile from './pages/UserProfile';
 
 function App() {
   return (
