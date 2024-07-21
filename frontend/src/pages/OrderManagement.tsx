@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { ShoppingCart, Package, Truck, CheckCircle, Plus, Edit, X, Bell } from 'lucide-react'
+import { ShoppingCart, Package, Truck, CheckCircle, Plus, Edit, X } from 'lucide-react'
 import Swal from 'sweetalert2'
 
 interface Order {
@@ -18,18 +18,11 @@ interface OrderItem {
   price: number
 }
 
-interface Notification {
-  id: string
-  message: string
-  read: boolean
-}
-
 const OrderManagement: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([])
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [isCreatingOrder, setIsCreatingOrder] = useState(false)
   const [newOrderItems, setNewOrderItems] = useState<OrderItem[]>([])
-  const [notifications, setNotifications] = useState<Notification[]>([])
 
   useEffect(() => {
     // Simular la carga de pedidos desde una API
@@ -58,11 +51,16 @@ const OrderManagement: React.FC = () => {
     ]
     setOrders(mockOrders)
 
-    // Simular notificaciones iniciales
-    setNotifications([
-      { id: '1', message: 'Su pedido #1 ha sido procesado', read: false },
-      { id: '2', message: 'Su pedido #2 ha sido enviado', read: false }
-    ])
+    // Mostrar notificaciones iniciales
+    Swal.fire({
+      title: 'Notificaciones',
+      html: `
+        <p>Su pedido #1 ha sido procesado</p>
+        <p>Su pedido #2 ha sido enviado</p>
+      `,
+      icon: 'info',
+      confirmButtonText: 'Entendido'
+    })
   }, [])
 
   const handleOrderClick = (order: Order) => {
@@ -97,6 +95,10 @@ const OrderManagement: React.FC = () => {
 
   const handleItemChange = (index: number, field: keyof OrderItem, value: string | number) => {
     const updatedItems = [...newOrderItems]
+    if (field === 'price') {
+      // Remover el "S/." y cualquier carácter no numérico antes de convertir a número
+      value = parseFloat(value.toString().replace(/[^0-9.]/g, ''))
+    }
     updatedItems[index] = { ...updatedItems[index], [field]: value }
     setNewOrderItems(updatedItems)
   }
@@ -131,7 +133,7 @@ const OrderManagement: React.FC = () => {
       cancelButtonText: 'No, mantener pedido'
     }).then((result) => {
       if (result.isConfirmed) {
-        setOrders(orders.map(order => 
+        setOrders(orders.map(order =>
           order.id === orderId ? { ...order, status: 'cancelled' } : order
         ))
         showNotification('info', `El pedido #${orderId} ha sido cancelado`)
@@ -148,46 +150,29 @@ const OrderManagement: React.FC = () => {
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
-      }
     })
-
-    const newNotification: Notification = {
-      id: (notifications.length + 1).toString(),
-      message,
-      read: false
-    }
-    setNotifications([...notifications, newNotification])
-  }
-
-  const handleReadNotification = (notificationId: string) => {
-    setNotifications(notifications.map(notification =>
-      notification.id === notificationId ? { ...notification, read: true } : notification
-    ))
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold mb-6">Gestión de Pedidos</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
+        <div className="md:col-span-1 bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Mis Pedidos</h3>
             <button
               onClick={handleCreateOrder}
-              className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 flex items-center"
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300 flex items-center"
             >
-              <Plus size={18} className="mr-1" /> Nuevo Pedido
+              <Plus size={18} className="mr-2" /> Nuevo Pedido
             </button>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
             {orders.map(order => (
               <div
                 key={order.id}
                 className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                  selectedOrder?.id === order.id ? 'bg-blue-100 border-blue-300' : 'hover:bg-gray-50'
+                  selectedOrder?.id === order.id ? 'bg-blue-50 border-blue-300' : 'hover:bg-gray-50'
                 }`}
                 onClick={() => handleOrderClick(order)}
               >
@@ -198,12 +183,12 @@ const OrderManagement: React.FC = () => {
                 <p className="text-sm text-gray-600">
                   {new Date(order.createdAt).toLocaleDateString()}
                 </p>
-                <p className="font-semibold mt-2">${order.totalAmount.toFixed(2)}</p>
+                <p className="font-semibold mt-2">S/.{order.totalAmount.toFixed(2)}</p>
               </div>
             ))}
           </div>
         </div>
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-xl font-semibold mb-4">
             {isCreatingOrder ? 'Crear Nuevo Pedido' : 'Detalles del Pedido'}
           </h3>
@@ -211,52 +196,75 @@ const OrderManagement: React.FC = () => {
             <div className="bg-white p-6 rounded-lg shadow">
               <h4 className="text-lg font-semibold mb-4">Artículos del Pedido</h4>
               {newOrderItems.map((item, index) => (
-                <div key={index} className="flex items-center space-x-2 mb-2">
+                <div key={index} className="mb-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del medicamento</label>
                   <input
                     type="text"
-                    placeholder="Nombre del medicamento"
                     value={item.name}
                     onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                    className="flex-grow px-2 py-1 border rounded"
+                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Ej: Paracetamol"
                   />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
                   <input
                     type="number"
                     placeholder="Cantidad"
                     value={item.quantity}
                     onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
-                    className="w-20 px-2 py-1 border rounded"
+                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        min="1"
                   />
+                    </div>
+                    <div className="relative">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Precio</label>
+                      <div className="relative">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-600">
+                          S/.
+                        </span>
                   <input
-                    type="number"
-                    placeholder="Precio"
-                    value={item.price}
-                    onChange={(e) => handleItemChange(index, 'price', parseFloat(e.target.value))}
-                    className="w-24 px-2 py-1 border rounded"
+                          type="text"
+                          value={`${item.price}`}
+                          onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+                          className="w-full pl-10 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="0.00"
                   />
-                  <button onClick={() => handleRemoveItem(index)} className="text-red-500">
-                    <X size={18} />
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveItem(index)}
+                    className="mt-2 text-red-500 hover:text-red-700 flex items-center"
+                  >
+                    <X size={16} className="mr-1" /> Eliminar
                   </button>
                 </div>
               ))}
-              <button onClick={handleAddItem} className="mt-2 text-blue-500 hover:text-blue-600">
-                + Agregar artículo
+              <button
+                onClick={handleAddItem}
+                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300 flex items-center"
+              >
+                <Plus size={18} className="mr-2" /> Agregar artículo
               </button>
-              <div className="mt-4">
+              <div className="mt-6">
                 <button
                   onClick={handleSubmitOrder}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                  className="bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 transition duration-300 flex items-center justify-center w-full md:w-auto"
                 >
-                  Crear Pedido
+                  <ShoppingCart size={18} className="mr-2" /> Crear Pedido
                 </button>
               </div>
             </div>
           ) : selectedOrder ? (
-            <div className="bg-white p-6 rounded-lg shadow">
+            <div>
               <div className="flex justify-between items-center mb-4">
                 <h4 className="text-lg font-semibold">Pedido #{selectedOrder.id}</h4>
                 <div className="flex items-center space-x-2">
                   <span className="px-3 py-1 rounded-full text-sm font-medium capitalize" style={{
-                    backgroundColor: 
+                    backgroundColor:
                       selectedOrder.status === 'pending' ? 'rgb(253, 230, 138)' :
                       selectedOrder.status === 'processing' ? 'rgb(191, 219, 254)' :
                       selectedOrder.status === 'shipped' ? 'rgb(216, 180, 254)' :
@@ -274,7 +282,7 @@ const OrderManagement: React.FC = () => {
                   {selectedOrder.status !== 'cancelled' && selectedOrder.status !== 'delivered' && (
                     <button
                       onClick={() => handleCancelOrder(selectedOrder.id)}
-                      className="bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 text-sm"
+                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition duration-300 text-sm"
                     >
                       Cancelar Pedido
                     </button>
@@ -288,7 +296,7 @@ const OrderManagement: React.FC = () => {
                 <h5 className="font-semibold mb-2">Artículos:</h5>
                 <ul className="space-y-2">
                   {selectedOrder.items.map(item => (
-                    <li key={item.medicationId} className="flex justify-between">
+                    <li key={item.medicationId} className="flex justify-between bg-gray-50 p-2 rounded">
                       <span>{item.name} x {item.quantity}</span>
                       <span>${(item.price * item.quantity).toFixed(2)}</span>
                     </li>
@@ -296,7 +304,7 @@ const OrderManagement: React.FC = () => {
                 </ul>
               </div>
               <div className="border-t pt-4">
-                <div className="flex justify-between font-semibold">
+                <div className="flex justify-between font-semibold text-lg">
                   <span>Total:</span>
                   <span>${selectedOrder.totalAmount.toFixed(2)}</span>
                 </div>
@@ -306,35 +314,6 @@ const OrderManagement: React.FC = () => {
             <p className="text-gray-500">Selecciona un pedido para ver sus detalles o crea uno nuevo.</p>
           )}
         </div>
-      </div>
-      <div className="mt-8">
-        <h3 className="text-xl font-semibold mb-4 flex items-center">
-          <Bell className="mr-2" /> Notificaciones
-        </h3>
-        {notifications.length > 0 ? (
-          <ul className="space-y-2">
-            {notifications.map(notification => (
-              <li
-                key={notification.id}
-                className={`p-3 rounded-md ${notification.read ? 'bg-gray-100' : 'bg-blue-100'}`}
-              >
-                <div className="flex justify-between items-center">
-                  <span>{notification.message}</span>
-                  {!notification.read && (
-                    <button
-                      onClick={() => handleReadNotification(notification.id)}
-                      className="text-sm text-blue-600 hover:text-blue-800"
-                    >
-                      Marcar como leída
-                    </button>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No hay notificaciones nuevas.</p>
-        )}
       </div>
     </div>
   )
