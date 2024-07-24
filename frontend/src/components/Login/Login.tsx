@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios, { csrf } from '../../../src/utils/axios';
+import axios, { csrf } from '../../utils/axios.js';
 import { useNavigate } from 'react-router-dom';
 
 const Login = ({ setUser }) => {
