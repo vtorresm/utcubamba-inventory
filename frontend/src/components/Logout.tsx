@@ -1,4 +1,4 @@
-import axios, { csrf } from '../axios';
+import axios, { csrf } from '../utils/axios';
 import { useNavigate } from 'react-router-dom';
 
 const Logout = ({ setUser }) => {
