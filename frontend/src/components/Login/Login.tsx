@@ -1,39 +1,74 @@
-import React, { useState } from 'react';
-import axios, { csrf } from '../../utils/axios.js';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import Swal from 'sweetalert2';
+import axios from 'axios';
 
-const Login = ({ setUser }) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [attempts, setAttempts] = useState(0);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        await csrf();
-        try {
-            const response = await axios.post('/login', { email, password });
-            setUser(response.data.user);
-            navigate('/');
-        } catch (error) {
-            setError('Login failed');
-        }
-    };
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label>Email:</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            </div>
-            <div>
-                <label>Password:</label>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            </div>
-            {error && <p>{error}</p>}
-            <button type="submit">Login</button>
-        </form>
-    );
+    if (attempts >= 3) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Demasiados intentos',
+        text: 'Has alcanzado el número máximo de intentos de login.',
+      });
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/login', {
+        email,
+        password,
+      });
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Login exitoso',
+        text: response.data.message,
+      });
+
+      // Redirigir al home
+      window.location.href = '/home';
+    } catch (error) {
+      setAttempts(attempts + 1);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.response.data.message || 'Credenciales inválidas',
+      });
+    }
+  };
+
+  return (
+    <div>
+      <h2>Login</h2>
+      <form onSubmit={handleLogin}>
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  );
 };
 
 export default Login;
