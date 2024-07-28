@@ -7,65 +7,39 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [attempts, setAttempts] = useState(0);
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (attempts >= 3) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Demasiados intentos',
-        text: 'Has alcanzado el número máximo de intentos de login.',
-      });
-      return;
-    }
-
     try {
-      const response = await axios.post('http://localhost:8000/api/login', {
-        email,
-        password,
-      });
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Login exitoso',
-        text: response.data.message,
-      });
-
+      const response = await axios.post('/api/login', { email, password });
+      Swal.fire('Success', response.data.message, 'success');
       // Redirigir al home
       window.location.href = '/home';
     } catch (error) {
-      setAttempts(attempts + 1);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.response.data.message || 'Credenciales inválidas',
-      });
+      const newAttempts = attempts + 1;
+      setAttempts(newAttempts);
+
+      if (newAttempts >= 3) {
+        Swal.fire('Error', 'Too many failed attempts. Try again later.', 'error');
+        // Deshabilitar el formulario o realizar otras acciones
+      } else {
+        Swal.fire('Error', error.response.data.message, 'error');
+      }
     }
   };
 
   return (
     <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleSubmit}>
         <div>
           <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div>
           <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" disabled={attempts >= 3}>Login</button>
       </form>
     </div>
   );
