@@ -1,4 +1,5 @@
-import axios, { csrf } from '../utils/axios';
+
+import axios, { csrf } from '../../utils/axios';
 import { useNavigate } from 'react-router-dom';
 
 const Logout = ({ setUser }) => {
@@ -16,7 +17,9 @@ const Logout = ({ setUser }) => {
     };
 
     return (
-        <button onClick={handleLogout}>Logout</button>
+        <button onClick={handleLogout} className="text-gray-600 hover:text-blue-600">
+            Logout
+        </button>
     );
 };
 
