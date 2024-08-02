@@ -1,38 +1,29 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../config/db';
+import { Model, DataTypes } from 'sequelize';
+import bcrypt from 'bcryptjs';
+import sequelize from '../config/database';
 
-interface UserAttributes {
-  id: number;
-  email: string;
-  password: string;
-  name: string;
-  profileId: number;
-  confirmed: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
-
-class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+class User extends Model {
   public id!: number;
+  public name!: string;
   public email!: string;
   public password!: string;
-  public name!: string;
-  public profileId!: number;
-  public confirmed!: boolean;
+  public role!: 'admin' | 'user';
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public async comparePassword(candidatePassword: string): Promise<boolean> {
+    return bcrypt.compare(candidatePassword, this.password);
+  }
 }
 
-User.init(
-  {
+User.init({
     id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+    type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -45,28 +36,19 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
+  role: {
+    type: DataTypes.ENUM('admin', 'user'),
+    defaultValue: 'user',
     },
-    profileId: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      references: {
-        model: 'profiles', // name of the table
-        key: 'id',
-      },
+}, {
+  sequelize,
+  modelName: 'User',
+  hooks: {
+    beforeCreate: async (user: User) => {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
     },
-    confirmed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
     },
-  },
-  {
-    sequelize,
-    tableName: 'users',
-    timestamps: true,
-  }
-);
+});
 
 export default User;
