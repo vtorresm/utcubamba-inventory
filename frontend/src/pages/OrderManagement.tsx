@@ -1,28 +1,36 @@
-import React, { useState, useEffect } from 'react'
-import { ShoppingCart, Package, Truck, CheckCircle, Plus, Edit, X } from 'lucide-react'
-import Swal from 'sweetalert2'
+import React, { useState, useEffect } from 'react';
+import {
+  ShoppingCart,
+  Package,
+  Truck,
+  CheckCircle,
+  Plus,
+  Edit,
+  X,
+} from 'lucide-react';
+import Swal from 'sweetalert2';
 
 interface Order {
-  id: string
-  userId: string
-  items: OrderItem[]
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
-  totalAmount: number
-  createdAt: string
+  id: string;
+  userId: string;
+  items: OrderItem[];
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  totalAmount: number;
+  createdAt: string;
 }
 
 interface OrderItem {
-  medicationId: number
-  name: string
-  quantity: number
-  price: number
+  medicationId: number;
+  name: string;
+  quantity: number;
+  price: number;
 }
 
 const OrderManagement: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>([])
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const [isCreatingOrder, setIsCreatingOrder] = useState(false)
-  const [newOrderItems, setNewOrderItems] = useState<OrderItem[]>([])
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [newOrderItems, setNewOrderItems] = useState<OrderItem[]>([]);
 
   useEffect(() => {
     // Simular la carga de pedidos desde una API
@@ -32,24 +40,24 @@ const OrderManagement: React.FC = () => {
         userId: 'user1',
         items: [
           { medicationId: 1, name: 'Ibuprofen', quantity: 2, price: 9.99 },
-          { medicationId: 3, name: 'Loratadine', quantity: 1, price: 12.99 }
+          { medicationId: 3, name: 'Loratadine', quantity: 1, price: 12.99 },
         ],
         status: 'processing',
         totalAmount: 32.97,
-        createdAt: '2024-03-15T10:30:00Z'
+        createdAt: '2024-03-15T10:30:00Z',
       },
       {
         id: '2',
         userId: 'user1',
         items: [
-          { medicationId: 2, name: 'Amoxicillin', quantity: 1, price: 15.99 }
+          { medicationId: 2, name: 'Amoxicillin', quantity: 1, price: 15.99 },
         ],
         status: 'shipped',
         totalAmount: 15.99,
-        createdAt: '2024-03-14T14:45:00Z'
-      }
-    ]
-    setOrders(mockOrders)
+        createdAt: '2024-03-14T14:45:00Z',
+      },
+    ];
+    setOrders(mockOrders);
 
     // Mostrar notificaciones iniciales
     Swal.fire({
@@ -59,53 +67,60 @@ const OrderManagement: React.FC = () => {
         <p>Su pedido #2 ha sido enviado</p>
       `,
       icon: 'info',
-      confirmButtonText: 'Entendido'
-    })
-  }, [])
+      confirmButtonText: 'Entendido',
+    });
+  }, []);
 
   const handleOrderClick = (order: Order) => {
-    setSelectedOrder(order)
-    setIsCreatingOrder(false)
-  }
+    setSelectedOrder(order);
+    setIsCreatingOrder(false);
+  };
 
   const getStatusIcon = (status: Order['status']) => {
     switch (status) {
       case 'pending':
-        return <ShoppingCart className="text-yellow-500" />
+        return <ShoppingCart className="text-yellow-500" />;
       case 'processing':
-        return <Package className="text-blue-500" />
+        return <Package className="text-blue-500" />;
       case 'shipped':
-        return <Truck className="text-purple-500" />
+        return <Truck className="text-purple-500" />;
       case 'delivered':
-        return <CheckCircle className="text-green-500" />
+        return <CheckCircle className="text-green-500" />;
       case 'cancelled':
-        return <X className="text-red-500" />
-    }
+        return <X className="text-red-500" />;
   }
+  };
 
   const handleCreateOrder = () => {
-    setIsCreatingOrder(true)
-    setSelectedOrder(null)
-    setNewOrderItems([])
-  }
+    setIsCreatingOrder(true);
+    setSelectedOrder(null);
+    setNewOrderItems([]);
+  };
 
   const handleAddItem = () => {
-    setNewOrderItems([...newOrderItems, { medicationId: 0, name: '', quantity: 1, price: 0 }])
-  }
+    setNewOrderItems([
+      ...newOrderItems,
+      { medicationId: 0, name: '', quantity: 1, price: 0 },
+    ]);
+  };
 
-  const handleItemChange = (index: number, field: keyof OrderItem, value: string | number) => {
-    const updatedItems = [...newOrderItems]
+  const handleItemChange = (
+    index: number,
+    field: keyof OrderItem,
+    value: string | number
+  ) => {
+    const updatedItems = [...newOrderItems];
     if (field === 'price') {
       // Remover el "S/." y cualquier carácter no numérico antes de convertir a número
-      value = parseFloat(value.toString().replace(/[^0-9.]/g, ''))
-    }
-    updatedItems[index] = { ...updatedItems[index], [field]: value }
-    setNewOrderItems(updatedItems)
+      value = parseFloat(value.toString().replace(/[^0-9.]/g, ''));
   }
+    updatedItems[index] = { ...updatedItems[index], [field]: value };
+    setNewOrderItems(updatedItems);
+  };
 
   const handleRemoveItem = (index: number) => {
-    setNewOrderItems(newOrderItems.filter((_, i) => i !== index))
-  }
+    setNewOrderItems(newOrderItems.filter((_, i) => i !== index));
+  };
 
   const handleSubmitOrder = () => {
     const newOrder: Order = {
@@ -113,33 +128,41 @@ const OrderManagement: React.FC = () => {
       userId: 'user1',
       items: newOrderItems,
       status: 'pending',
-      totalAmount: newOrderItems.reduce((total, item) => total + item.price * item.quantity, 0),
-      createdAt: new Date().toISOString()
-    }
-    setOrders([...orders, newOrder])
-    setIsCreatingOrder(false)
-    showNotification('success', `Su nuevo pedido #${newOrder.id} ha sido creado`)
-  }
+      totalAmount: newOrderItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
+      createdAt: new Date().toISOString(),
+    };
+    setOrders([...orders, newOrder]);
+    setIsCreatingOrder(false);
+    showNotification(
+      'success',
+      `Su nuevo pedido #${newOrder.id} ha sido creado`
+    );
+  };
 
   const handleCancelOrder = (orderId: string) => {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: "No podrás revertir esta acción",
+      text: 'No podrás revertir esta acción',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, cancelar pedido',
-      cancelButtonText: 'No, mantener pedido'
+      cancelButtonText: 'No, mantener pedido',
     }).then((result) => {
       if (result.isConfirmed) {
-        setOrders(orders.map(order =>
+        setOrders(
+          orders.map((order) =>
           order.id === orderId ? { ...order, status: 'cancelled' } : order
-        ))
-        showNotification('info', `El pedido #${orderId} ha sido cancelado`)
-      }
-    })
+          )
+        );
+        showNotification('info', `El pedido #${orderId} ha sido cancelado`);
   }
+    });
+  };
 
   const showNotification = (icon: 'success' | 'error' | 'warning' | 'info', message: string) => {
     Swal.fire({
