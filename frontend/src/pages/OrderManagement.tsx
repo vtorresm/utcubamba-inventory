@@ -164,7 +164,10 @@ const OrderManagement: React.FC = () => {
     });
   };
 
-  const showNotification = (icon: 'success' | 'error' | 'warning' | 'info', message: string) => {
+  const showNotification = (
+    icon: 'success' | 'error' | 'warning' | 'info',
+    message: string
+  ) => {
     Swal.fire({
       icon,
       title: message,
@@ -173,8 +176,8 @@ const OrderManagement: React.FC = () => {
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true,
-    })
-  }
+    });
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -191,11 +194,13 @@ const OrderManagement: React.FC = () => {
             </button>
           </div>
           <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
-            {orders.map(order => (
+            {orders.map((order) => (
               <div
                 key={order.id}
                 className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                  selectedOrder?.id === order.id ? 'bg-blue-50 border-blue-300' : 'hover:bg-gray-50'
+                  selectedOrder?.id === order.id
+                    ? 'bg-blue-50 border-blue-300'
+                    : 'hover:bg-gray-50'
                 }`}
                 onClick={() => handleOrderClick(order)}
               >
@@ -206,7 +211,9 @@ const OrderManagement: React.FC = () => {
                 <p className="text-sm text-gray-600">
                   {new Date(order.createdAt).toLocaleDateString()}
                 </p>
-                <p className="font-semibold mt-2">S/.{order.totalAmount.toFixed(2)}</p>
+                <p className="font-semibold mt-2">
+                  S/.{order.totalAmount.toFixed(2)}
+                </p>
               </div>
             ))}
           </div>
@@ -217,33 +224,49 @@ const OrderManagement: React.FC = () => {
           </h3>
           {isCreatingOrder ? (
             <div className="bg-white p-6 rounded-lg shadow">
-              <h4 className="text-lg font-semibold mb-4">Artículos del Pedido</h4>
+              <h4 className="text-lg font-semibold mb-4">
+                Artículos del Pedido
+              </h4>
               {newOrderItems.map((item, index) => (
                 <div key={index} className="mb-4 p-4 bg-gray-50 rounded-lg">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="col-span-1 md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del medicamento</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Nombre del medicamento
+                      </label>
                   <input
                     type="text"
                     value={item.name}
-                    onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+                        onChange={(e) =>
+                          handleItemChange(index, 'name', e.target.value)
+                        }
                         className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="Ej: Paracetamol"
                   />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Cantidad
+                      </label>
                   <input
                     type="number"
                     placeholder="Cantidad"
                     value={item.quantity}
-                    onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
+                        onChange={(e) =>
+                          handleItemChange(
+                            index,
+                            'quantity',
+                            parseInt(e.target.value)
+                          )
+                        }
                         className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         min="1"
                   />
                     </div>
                     <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Precio</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Precio
+                      </label>
                       <div className="relative">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-600">
                           S/.
@@ -251,7 +274,9 @@ const OrderManagement: React.FC = () => {
                   <input
                           type="text"
                           value={`${item.price}`}
-                          onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+                          onChange={(e) =>
+                            handleItemChange(index, 'price', e.target.value)
+                          }
                           className="w-full pl-10 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           placeholder="0.00"
                   />
@@ -284,9 +309,13 @@ const OrderManagement: React.FC = () => {
           ) : selectedOrder ? (
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h4 className="text-lg font-semibold">Pedido #{selectedOrder.id}</h4>
+                <h4 className="text-lg font-semibold">
+                  Pedido #{selectedOrder.id}
+                </h4>
                 <div className="flex items-center space-x-2">
-                  <span className="px-3 py-1 rounded-full text-sm font-medium capitalize" style={{
+                  <span
+                    className="px-3 py-1 rounded-full text-sm font-medium capitalize"
+                    style={{
                     backgroundColor:
                       selectedOrder.status === 'pending' ? 'rgb(253, 230, 138)' :
                       selectedOrder.status === 'processing' ? 'rgb(191, 219, 254)' :
