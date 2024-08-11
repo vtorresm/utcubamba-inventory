@@ -317,21 +317,31 @@ const OrderManagement: React.FC = () => {
                     className="px-3 py-1 rounded-full text-sm font-medium capitalize"
                     style={{
                     backgroundColor:
-                      selectedOrder.status === 'pending' ? 'rgb(253, 230, 138)' :
-                      selectedOrder.status === 'processing' ? 'rgb(191, 219, 254)' :
-                      selectedOrder.status === 'shipped' ? 'rgb(216, 180, 254)' :
-                      selectedOrder.status === 'delivered' ? 'rgb(167, 243, 208)' :
-                      'rgb(254, 202, 202)',
+                        selectedOrder.status === 'pending'
+                          ? 'rgb(253, 230, 138)'
+                          : selectedOrder.status === 'processing'
+                          ? 'rgb(191, 219, 254)'
+                          : selectedOrder.status === 'shipped'
+                          ? 'rgb(216, 180, 254)'
+                          : selectedOrder.status === 'delivered'
+                          ? 'rgb(167, 243, 208)'
+                          : 'rgb(254, 202, 202)',
                     color:
-                      selectedOrder.status === 'pending' ? 'rgb(146, 64, 14)' :
-                      selectedOrder.status === 'processing' ? 'rgb(30, 64, 175)' :
-                      selectedOrder.status === 'shipped' ? 'rgb(107, 33, 168)' :
-                      selectedOrder.status === 'delivered' ? 'rgb(6, 95, 70)' :
-                      'rgb(153, 27, 27)'
-                  }}>
+                        selectedOrder.status === 'pending'
+                          ? 'rgb(146, 64, 14)'
+                          : selectedOrder.status === 'processing'
+                          ? 'rgb(30, 64, 175)'
+                          : selectedOrder.status === 'shipped'
+                          ? 'rgb(107, 33, 168)'
+                          : selectedOrder.status === 'delivered'
+                          ? 'rgb(6, 95, 70)'
+                          : 'rgb(153, 27, 27)',
+                    }}
+                  >
                     {selectedOrder.status}
                   </span>
-                  {selectedOrder.status !== 'cancelled' && selectedOrder.status !== 'delivered' && (
+                  {selectedOrder.status !== 'cancelled' &&
+                    selectedOrder.status !== 'delivered' && (
                     <button
                       onClick={() => handleCancelOrder(selectedOrder.id)}
                       className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition duration-300 text-sm"
@@ -342,14 +352,20 @@ const OrderManagement: React.FC = () => {
                 </div>
               </div>
               <p className="text-sm text-gray-600 mb-4">
-                Fecha del pedido: {new Date(selectedOrder.createdAt).toLocaleString()}
+                Fecha del pedido:{' '}
+                {new Date(selectedOrder.createdAt).toLocaleString()}
               </p>
               <div className="mb-4">
                 <h5 className="font-semibold mb-2">Artículos:</h5>
                 <ul className="space-y-2">
-                  {selectedOrder.items.map(item => (
-                    <li key={item.medicationId} className="flex justify-between bg-gray-50 p-2 rounded">
-                      <span>{item.name} x {item.quantity}</span>
+                  {selectedOrder.items.map((item) => (
+                    <li
+                      key={item.medicationId}
+                      className="flex justify-between bg-gray-50 p-2 rounded"
+                    >
+                      <span>
+                        {item.name} x {item.quantity}
+                      </span>
                       <span>${(item.price * item.quantity).toFixed(2)}</span>
                     </li>
                   ))}
@@ -363,12 +379,14 @@ const OrderManagement: React.FC = () => {
               </div>
             </div>
           ) : (
-            <p className="text-gray-500">Selecciona un pedido para ver sus detalles o crea uno nuevo.</p>
+            <p className="text-gray-500">
+              Selecciona un pedido para ver sus detalles o crea uno nuevo.
+            </p>
           )}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default OrderManagement
+export default OrderManagement;
