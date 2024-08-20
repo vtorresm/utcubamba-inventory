@@ -15,19 +15,3 @@ export const corsConfig: CorsOptions = {
     }
   },
 };
-
-/* import cors from 'cors';
-
-const whitelist = [process.env.FRONTEND_URL];
-
-export const corsConfig: cors.CorsOptions = {
-  origin: (origin, callback) => {
-    if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Error de CORS'));
-    }
-  },
-  credentials: true,
-};
- */
