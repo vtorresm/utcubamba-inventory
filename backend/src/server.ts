@@ -8,6 +8,7 @@ import authRoutes from './routes/auth.routes';
 import medicationRoutes from './routes/medication.routes';
 import predictionRoutes from './routes/prediction.routes';
 import alertRoutes from './routes/alert.routes';
+import analysisRoutes from './routes/analysis.routes';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/medications', medicationRoutes);
 app.use('/api/predictions', predictionRoutes);
 app.use('/api/alerts', alertRoutes);
+app.use('/api/analysis', analysisRoutes);
 
 // Database connection and sync
 sequelize.sync({ alter: true })
@@ -35,7 +37,5 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+export default app;
