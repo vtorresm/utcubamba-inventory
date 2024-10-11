@@ -1,14 +1,21 @@
-import React, { useState } from 'react'
+import { useState, useContext, FormEvent } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
-const Login: React.FC = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+const Login = () => {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const authContext = useContext(AuthContext);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // TODO: Implement login logic
-    console.log('Login attempt', { email, password })
+  if (!authContext) {
+    throw new Error("AuthContext must be used within an AuthProvider");
   }
+
+  const { login } = authContext;
+
+  const handleSubmit = async (e: FormEvent) => {
+      e.preventDefault();
+      await login(email, password);
+  };
 
   return (
     <div className="max-w-md mx-auto">
