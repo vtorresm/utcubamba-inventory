@@ -1,14 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Pill, ShoppingCart, FileText, BarChart, TrendingUp, Home, LogIn, UserPlus, LineChart, Bell } from 'lucide-react';
-import Logout from '../components/Logout/Logout';
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Pill, Home, LogIn, ChevronDown } from 'lucide-react'
 
-interface HeaderProps {
-    user: any;
-    setUser: (user: any) => void;
-}
+const Header: React.FC = () => {
+  const [isAuthDropdownOpen, setIsAuthDropdownOpen] = useState(false);
+  const [isLoggedIn] = useState(false); // This would come from your auth context/state
 
-const Header: React.FC<HeaderProps> = ({ user, setUser }) => {
     return (
         <header className="bg-white shadow-md">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -17,59 +14,85 @@ const Header: React.FC<HeaderProps> = ({ user, setUser }) => {
                     MediInventory
                 </Link>
                 <nav>
-                    <ul className="flex space-x-4">
-                        <li><Link to="/" className="text-gray-600 hover:text-blue-600 flex items-center">
+          <ul className="flex space-x-4 items-center">
+            <li>
+              <Link to="/" className="text-gray-600 hover:text-blue-600 flex items-center">
                             <Home className="mr-1" size={18} />
-                            Home
-                        </Link></li>
-                        {user ? (
+                Inicio
+              </Link>
+            </li>
+            
+            {isLoggedIn ? (
+              // Menu items for logged-in users
                             <>
-                                <li><Link to="/catalog" className="text-gray-600 hover:text-blue-600 flex items-center">
-                                    <FileText className="mr-1" size={18} />
-                                    Catalog
-                                </Link></li>
-                                <li><Link to="/orders" className="text-gray-600 hover:text-blue-600 flex items-center">
-                                    <ShoppingCart className="mr-1" size={18} />
-                                    Orders
-                                </Link></li>
-                                <li><Link to="/reports" className="text-gray-600 hover:text-blue-600 flex items-center">
-                                    <BarChart className="mr-1" size={18} />
-                                    Reports
-                                </Link></li>
-                                <li><Link to="/predictions" className="text-gray-600 hover:text-blue-600 flex items-center">
-                                    <TrendingUp className="mr-1" size={18} />
+                <li>
+                  <Link to="/catalog" className="text-gray-600 hover:text-blue-600">
+                    Catálogo
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/orders" className="text-gray-600 hover:text-blue-600">
+                    Ordenes
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/reports" className="text-gray-600 hover:text-blue-600">
+                    Reportes
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/predictions" className="text-gray-600 hover:text-blue-600">
                                     Predicciones
-                                </Link></li>
-                                <li><Link to="/analysis" className="text-gray-600 hover:text-blue-600 flex items-center">
-                                    <LineChart className="mr-1" size={18} />
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/analysis" className="text-gray-600 hover:text-blue-600">
                                     Análisis
-                                </Link></li>
-                                <li><Link to="/alert-management" className="text-gray-600 hover:text-blue-600 flex items-center">
-                                    <Bell className="mr-1" size={18} />
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/alert-management" className="text-gray-600 hover:text-blue-600">
                                     Alertas
-                                </Link></li>
-                                <li className="text-gray-600 flex items-center">
-                                    {user.name}
+                  </Link>
                                 </li>
-                                <li><Logout setUser={setUser} /></li>
                             </>
                         ) : (
-                            <>
-                                <li><Link to="/login" className="text-gray-600 hover:text-blue-600 flex items-center">
+              // Auth dropdown for non-logged-in users
+              <li className="relative">
+                <button
+                  onClick={() => setIsAuthDropdownOpen(!isAuthDropdownOpen)}
+                  className="flex items-center text-gray-600 hover:text-blue-600 focus:outline-none"
+                >
                                     <LogIn className="mr-1" size={18} />
-                                    Login
-                                </Link></li>
-                                <li><Link to="/register" className="text-gray-600 hover:text-blue-600 flex items-center">
-                                    <UserPlus className="mr-1" size={18} />
-                                    Registrar
-                                </Link></li>
-                            </>
+                  Acceso
+                  <ChevronDown className="ml-1" size={16} />
+                </button>
+                
+                {isAuthDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                    <Link
+                      to="/login"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsAuthDropdownOpen(false)}
+                    >
+                      Iniciar Sesión
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsAuthDropdownOpen(false)}
+                    >
+                      Registrarse
+                    </Link>
+                  </div>
+                )}
+              </li>
                         )}
                     </ul>
                 </nav>
             </div>
         </header>
-    );
-};
+  )
+}
 
-export default Header;
+export default Header
